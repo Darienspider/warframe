@@ -1,7 +1,19 @@
 """
 Warframe Bot
 Created by Shadarien Williams
+
+Terminal based bot that scans warframe markets for the item entered and returns either their hightest, lowest, and average price
+or all auctions that have been made for said item.
 """
+
+"""
+UPDATES:
+
+Date                                           Name                                         Description
+5/12/2024                                  Shadarien Williams                              Initial upload
+
+"""
+
 
 import requests as rq
 import json 
@@ -57,8 +69,6 @@ class warframeApi:
             return False, None
         
         engine.close()
-        # Torid acri-ignicron
-
 
     def get_arcane(arcane_name:str):
         data = {}
@@ -77,8 +87,6 @@ class warframeApi:
         except Exception as e:
             print(f'ERROR: {e} ')
             
-
-
     def scan_warframe(item_name):
         item_name = item_name.lower()
         item_name = str(item_name).replace(" ","_")
