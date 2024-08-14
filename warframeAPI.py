@@ -224,7 +224,7 @@ while executed:
     elif int(choice) == 2:
         if str(scan_item).lower() in ["exit"," ","y"]:
             break
-        test.get_item_details(scan_item)
+        test.how_to_get_item(scan_item)
     else:
         break
 
