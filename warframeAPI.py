@@ -11,7 +11,7 @@ UPDATES:
 
 Date                                           Name                                         Description
 5/12/2024                                  Shadarien Williams                              Initial upload
-
+8/14/2024                                  Shadarien Williams                              updated code to use the engine globally and created a neww function that scans the wiki
 """
 
 
@@ -27,22 +27,76 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 #Torid acri-ignicron
 class warframeApi:
-    def __init__(self):
-        pass
+    def __init__(self, chrome_path: str):
+        # Initialize the Chrome driver
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        self.engine = engine = webdriver.Chrome( options = chrome_options)
+    
 
-    def getRiven(arcaneName : str):
-        weaponName = str(arcaneName).split()[0].lower()
-        arcane = str(arcaneName).split()[1]
+    def how_to_get_item(self,item_name : str):
+        item_name = str(item_name).replace(" ",'_')
+        site = f'https://warframe.fandom.com/wiki/{item_name}'
+
+        aquisitionTable = 'article-table sortable acquisition-table jquery-tablesorter'
+        craftingTable = 'foundrytable'
+
+        content = rq.get(site).content
+        scanner = BeautifulSoup(content,'lxml')
+        # apparently you can do compounded searches like this
+        # the [1:] is used to remove the header rows
+        how_to_get = scanner.find('tbody').find_all('tr')[1:]
+        
+        acquisitions = []
+        for index,value in enumerate(how_to_get):
+            details = (how_to_get[index].text.strip().split('\n'))
+            # convert extracted data to dictionary
+            extraction = { 'Name':
+                details[0], 
+                'Details':
+                    { 'location':
+                        details[1],
+                    'chance_of_drop':
+                    details[2],
+                    'expected_num_of_runs':
+                    details[3],
+                    'Gauranteed_num_of_runs':
+                    details[-1]
+                }
+            }
+
+            acquisitions.append(extraction)
+
+        self.acquisition = acquisitions
+        return self.acquisition
+
+
+
+        # skip the first row as it has the headers
+        # for i in how_to_get[1:]:
+        #     how_to_getItem.append(str(i.text).strip())
+
+        # may convert to a dictionary
+        self.acquisition = how_to_getItem
+        
+        return self.acquisition
+
+    def getRiven(self,arcaneName : str):
+        try:
+            weaponName = str(arcaneName).split()[0].lower()
+            arcane = str(arcaneName).split()[1]
+        except:
+            return "Not an Arcane"
         site = f'https://warframe.market/auctions/search?type=riven&weapon_url_name={weaponName}&sort_by=price_desc'
 
         chromePath = "/home/shadarien/Downloads/chrome-linux64/"
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        engine = webdriver.Chrome( options = chrome_options)
-        engine.get(site)
-        WebDriverWait(engine, 10).until(EC.presence_of_element_located((By.ID, "application-state")))
+        
+        self.engine.get(site)
+        WebDriverWait(self.engine, 10).until(EC.presence_of_element_located((By.ID, "application-state")))
 
-        scanner = BeautifulSoup(engine.page_source,'lxml')
+        scanner = BeautifulSoup(self.engine.page_source,'lxml')
         script_tag = scanner.find('script', {"id": "application-state"})
 
         # print(script_tag)
@@ -70,7 +124,7 @@ class warframeApi:
         
         engine.close()
 
-    def get_arcane(arcane_name:str):
+    def get_arcane(self,arcane_name:str):
         data = {}
         site = f"https://api.warframestat.us/arcanes/search/{arcane_name}"
         content = rq.get(site)
@@ -87,7 +141,7 @@ class warframeApi:
         except Exception as e:
             print(f'ERROR: {e} ')
             
-    def scan_warframe(item_name):
+    def scan_warframe(self,item_name):
         item_name = item_name.lower()
         item_name = str(item_name).replace(" ","_")
 
@@ -126,36 +180,55 @@ class warframeApi:
         message = (f'Average: {average_price}\nTotal Orders: {order_count}\nLowest Price: {lowest_price}\nHighest Price: {highest_price}\n\n')
         return (True, message)
 
-test = warframeApi
+    def close(self):
+        # Close the browser when done
+        self.engine.quit()
+
+chrome_path = "/home/shadarien/Downloads/chrome-linux64/chromedriver"  # Update this path
+test = warframeApi(chrome_path)
+
 executed = True
 # test.get_arcane("Arcane grace")
 counter = 0 
 
-while executed:
-    print("If you want to cancel script, enter 'y', exit, or an empty value (space)")
-    scan_item = input("Please enter item to scan: ")
-    # scan_item = 'Torid acri-ignicron'
-    if str(scan_item).lower() in ["exit"," ","y"]:
-        break
+# while executed:
+#     print("If you want to cancel script, enter 'y', exit, or an empty value (space)")
     
-    else:
-        counter +=1
-        print(f"Scanning for {scan_item}")
+#     # choice = input('What mode would you like to use? \n\t [1] Scan Warframe market \n\t [2] Scan Item Details \n ENTER HERE: ')
+#     # scan_item = input("\nPlease enter item to scan: ")
+
+#     if int(choice) == 1:
+#         # scan_item = 'Torid acri-ignicron'
+#         if str(scan_item).lower() in ["exit"," ","y"]:
+#             break
         
-        # Torid acri-ignicron
+#         else:
+#             counter +=1
+#             print(f"Scanning for {scan_item}")
+            
+#             # Torid acri-ignicron
 
-    output = test.getRiven(scan_item)
-    if output[0] or not TypeError:
-        print(output[1])
-    try:
-        output = test.scan_warframe(scan_item)[1]
-    except Exception as e:
-        try:
-            newItem = scan_item + ' Blueprint'
-            output = test.scan_warframe(newItem)[1]
-        except Exception as e:
-            print(f"Error : {e} \n Unable to locate item \n\n")
-    
-    print(output)
+#         output = test.getRiven(scan_item)
+#         if output[0] or not TypeError:
+#             print(output[1])
+#         try:
+#             output = test.scan_warframe(scan_item)[1]
+#         except Exception as e:
+#             try:
+#                 newItem = scan_item + ' Blueprint'
+#                 output = test.scan_warframe(newItem)[1]
+#             except Exception as e:
+#                 print(f"Error : {e} \n Unable to locate item \n\n")
+        
+#         print(output)
+#     elif int(choice) == 2:
+#         if str(scan_item).lower() in ["exit"," ","y"]:
+#             break
+#         test.get_item_details(scan_item)
+#     else:
+#         break
 
-
+scan_item = 'dante'
+test.how_to_get_item(scan_item)
+for i in test.acquisition:
+    print(i['Name'],' ',i['Details']['location'])
