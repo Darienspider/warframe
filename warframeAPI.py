@@ -33,23 +33,10 @@ class warframeApi:
         chrome_options.add_argument("--headless")
         self.engine = engine = webdriver.Chrome( options = chrome_options)
     
-
-    def how_to_get_item(self,item_name : str):
-        item_name = str(item_name).replace(" ",'_')
-        site = f'https://warframe.fandom.com/wiki/{item_name}'
-
-        aquisitionTable = 'article-table sortable acquisition-table jquery-tablesorter'
-        craftingTable = 'foundrytable'
-
-        content = rq.get(site).content
-        scanner = BeautifulSoup(content,'lxml')
-        # apparently you can do compounded searches like this
-        # the [1:] is used to remove the header rows
-        how_to_get = scanner.find('tbody').find_all('tr')[1:]
-        
+    def parse_warframe_acquisition(self,list_to_extract : list):
         acquisitions = []
-        for index,value in enumerate(how_to_get):
-            details = (how_to_get[index].text.strip().split('\n'))
+        for index,value in enumerate(list_to_extract):
+            details = (list_to_extract[index].text.strip().split('\n'))
             # convert extracted data to dictionary
             extraction = { 'Name':
                 details[0], 
@@ -71,15 +58,30 @@ class warframeApi:
         return self.acquisition
 
 
+    def how_to_get_item(self,item_name : str):
+        item_name = str(item_name).replace(" ",'_')
+        site = f'https://warframe.fandom.com/wiki/{item_name}'
 
-        # skip the first row as it has the headers
-        # for i in how_to_get[1:]:
-        #     how_to_getItem.append(str(i.text).strip())
+        aquisitionTable = 'article-table sortable acquisition-table jquery-tablesorter'
+        craftingTable = 'foundrytable'
 
-        # may convert to a dictionary
-        self.acquisition = how_to_getItem
-        
-        return self.acquisition
+        content = rq.get(site).content
+        scanner = BeautifulSoup(content,'lxml')
+        # apparently you can do compounded searches like this
+        # the [1:] is used to remove the header rows
+        tags = str(scanner.find('div', {'class':'page-header__categories'}).text).split()
+        for i in tags:
+            if 'warframes' in str(i).lower():
+                how_to_get = scanner.find('tbody').find_all('tr')[1:]
+                self.parse_warframe_acquisition(how_to_get)
+            if 'mods' in str(i).lower():
+                # TODO: Build Mod scanner function
+                print('Mods pending at this time')
+            if 'arcanes' in str(i).lower():
+                # TODO: Build arcane scanner function
+                print('Arcanes pending at this time')
+
+                pass
 
     def getRiven(self,arcaneName : str):
         try:
@@ -225,10 +227,11 @@ while executed:
         if str(scan_item).lower() in ["exit"," ","y"]:
             break
         test.how_to_get_item(scan_item)
+        print(test.acquisition)
     else:
         break
 
+# Testing section
 # scan_item = 'dante'
 # test.how_to_get_item(scan_item)
-# for i in test.acquisition:
-#     print(i['Name'],' ',i['Details']['location'])
+# print(test.acquisition)
