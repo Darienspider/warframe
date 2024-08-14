@@ -191,44 +191,44 @@ executed = True
 # test.get_arcane("Arcane grace")
 counter = 0 
 
-# while executed:
-#     print("If you want to cancel script, enter 'y', exit, or an empty value (space)")
+while executed:
+    print("If you want to cancel script, enter 'y', exit, or an empty value (space)")
     
-#     # choice = input('What mode would you like to use? \n\t [1] Scan Warframe market \n\t [2] Scan Item Details \n ENTER HERE: ')
-#     # scan_item = input("\nPlease enter item to scan: ")
+    choice = input('What mode would you like to use? \n\t [1] Scan Warframe market \n\t [2] Scan Item Details \n ENTER HERE: ')
+    scan_item = input("\nPlease enter item to scan: ")
 
-#     if int(choice) == 1:
-#         # scan_item = 'Torid acri-ignicron'
-#         if str(scan_item).lower() in ["exit"," ","y"]:
-#             break
+    if int(choice) == 1:
+        # scan_item = 'Torid acri-ignicron'
+        if str(scan_item).lower() in ["exit"," ","y"]:
+            break
         
-#         else:
-#             counter +=1
-#             print(f"Scanning for {scan_item}")
+        else:
+            counter +=1
+            print(f"Scanning for {scan_item}")
             
-#             # Torid acri-ignicron
+            # Torid acri-ignicron
 
-#         output = test.getRiven(scan_item)
-#         if output[0] or not TypeError:
-#             print(output[1])
-#         try:
-#             output = test.scan_warframe(scan_item)[1]
-#         except Exception as e:
-#             try:
-#                 newItem = scan_item + ' Blueprint'
-#                 output = test.scan_warframe(newItem)[1]
-#             except Exception as e:
-#                 print(f"Error : {e} \n Unable to locate item \n\n")
+        output = test.getRiven(scan_item)
+        if output[0] or not TypeError:
+            print(output[1])
+        try:
+            output = test.scan_warframe(scan_item)[1]
+        except Exception as e:
+            try:
+                newItem = scan_item + ' Blueprint'
+                output = test.scan_warframe(newItem)[1]
+            except Exception as e:
+                print(f"Error : {e} \n Unable to locate item \n\n")
         
-#         print(output)
-#     elif int(choice) == 2:
-#         if str(scan_item).lower() in ["exit"," ","y"]:
-#             break
-#         test.get_item_details(scan_item)
-#     else:
-#         break
+        print(output)
+    elif int(choice) == 2:
+        if str(scan_item).lower() in ["exit"," ","y"]:
+            break
+        test.get_item_details(scan_item)
+    else:
+        break
 
-scan_item = 'dante'
-test.how_to_get_item(scan_item)
-for i in test.acquisition:
-    print(i['Name'],' ',i['Details']['location'])
+# scan_item = 'dante'
+# test.how_to_get_item(scan_item)
+# for i in test.acquisition:
+#     print(i['Name'],' ',i['Details']['location'])
