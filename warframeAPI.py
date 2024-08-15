@@ -27,14 +27,18 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-#Torid acri-ignicron
+
 class warframeApi:
     def __init__(self, chrome_path: str):
         # Initialize the Chrome driver
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         self.engine = engine = webdriver.Chrome( options = chrome_options)
+        
     
+    def getScanOptions():
+        return ['wiki','market']
+
     def parse_warframe_acquisition(self,list_to_extract : list):
         acquisitions = []
         for index,value in enumerate(list_to_extract):
@@ -93,17 +97,12 @@ class warframeApi:
             return "Not an Arcane"
         site = f'https://warframe.market/auctions/search?type=riven&weapon_url_name={weaponName}&sort_by=price_desc'
 
-        chromePath = "/home/shadarien/Downloads/chrome-linux64/"
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        
         self.engine.get(site)
         WebDriverWait(self.engine, 10).until(EC.presence_of_element_located((By.ID, "application-state")))
 
         scanner = BeautifulSoup(self.engine.page_source,'lxml')
         script_tag = scanner.find('script', {"id": "application-state"})
 
-        # print(script_tag)
         try:
             data = json.loads(script_tag.string)
             auctions = data['payload']['auctions']
@@ -119,14 +118,16 @@ class warframeApi:
                 if (str(arcane.lower()) in str(item_name.lower())):
                     listedAuctions.append((item_name,  startingPrice, owner_ingame_name))
             
+            self.listedAuctions = listedAuctions
+
             if len(listedAuctions) >1:
-                return True,listedAuctions
+                return True,self.listedAuctions
             else:
                 return False,None
         except:
             return False, None
         
-        engine.close()
+        self.close()
 
     def get_arcane(self,arcane_name:str):
         data = {}
@@ -181,57 +182,66 @@ class warframeApi:
         average_price = total_price/order_count
         lowest_price = prices[0]
         highest_price = prices[-1]
-        message = (f'Average: {average_price}\nTotal Orders: {order_count}\nLowest Price: {lowest_price}\nHighest Price: {highest_price}\n\n')
-        return (True, message)
+        
+        self.market_extraction = {'Highest Price':highest_price, 'Lowest Price':lowest_price, 'Average Price': average_price}
+        return self.market_extraction
 
     def close(self):
         # Close the browser when done
         self.engine.quit()
 
-chrome_path = "/home/shadarien/Downloads/chrome-linux64/chromedriver"  # Update this path
-test = warframeApi(chrome_path)
 
-executed = True
-# test.get_arcane("Arcane grace")
-counter = 0 
 
-# while executed:
-#     print("If you want to cancel script, enter 'y', exit, or an empty value (space)")
-    
-#     choice = input('What mode would you like to use? \n\t [1] Scan Warframe market \n\t [2] Scan Item Details \n ENTER HERE: ')
-#     scan_item = input("\nPlease enter item to scan: ")
-
-#     if int(choice) == 1:
-#         # scan_item = 'Torid acri-ignicron'
-#         if str(scan_item).lower() in ["exit"," ","y"]:
-#             break
+if __name__ == "__main__":
         
-#         else:
-#             counter +=1
-#             print(f"Scanning for {scan_item}")
+    chrome_path = "/home/shadarien/Downloads/chrome-linux64/chromedriver"  # Update this path
+    test = warframeApi(chrome_path)
+
+
+    executed = True
+    # test.get_arcane("Arcane grace")
+    counter = 0 
+
+    choice = input('What mode would you like to use? \n\t [1] Scan Warframe market \n\t [2] Scan Item Details \n ENTER HERE: ')
+    while executed:
+        print("If you want to cancel script, enter 'y', exit, or an empty value (space)")
+        
+        scan_item = input("\nPlease enter item to scan: ")
+
+        if int(choice) == 1:
+            # scan_item = 'Torid acri-ignicron'
+            if str(scan_item).lower() in ["exit"," ","y"]:
+                break
             
-#             # Torid acri-ignicron
+            else:
+                counter +=1
+                print(f"Scanning for {scan_item}")
+                
+                # Torid acri-ignicron
 
-#         output = test.getRiven(scan_item)
-#         if output[0] or not TypeError:
-#             print(output[1])
-#         try:
-#             output = test.scan_warframe(scan_item)[1]
-#         except Exception as e:
-#             try:
-#                 newItem = scan_item + ' Blueprint'
-#                 output = test.scan_warframe(newItem)[1]
-#             except Exception as e:
-#                 print(f"Error : {e} \n Unable to locate item \n\n")
-        
-#         print(output)
-#     elif int(choice) == 2:
-#         if str(scan_item).lower() in ["exit"," ","y"]:
-#             break
-#         test.how_to_get_item(scan_item)
-#         print(test.acquisition)
-#     else:
-#         break
+            output = test.getRiven(scan_item)
+            if output[0] or not TypeError:
+                print(output[1])
+            try:
+                output = test.scan_warframe(scan_item)[1]
+            except Exception as e:
+                try:
+                    newItem = scan_item + ' Blueprint'
+                    output = test.scan_warframe(newItem)[1]
+                except Exception as e:
+                    print(f"Error : {e} \n Unable to locate item \n\n")
+            
+            print(output)
+        elif int(choice) == 2:
+            if str(scan_item).lower() in ["exit"," ","y"]:
+                break
+            try:
+                test.how_to_get_item(scan_item)
+                print(test.acquisition)
+            except:
+                print(None)
+        else:
+            break
 
 # Testing section
 # scan_item = 'dante'
