@@ -2,8 +2,10 @@
 Warframe Bot
 Created by Shadarien Williams
 
-Terminal based bot that scans warframe markets for the item entered and returns either their hightest, lowest, and average price
+Terminal based bot that scans warframe wiki for item details and the market for the item entered and returns the highest, lowest, and average price
 or all auctions that have been made for said item.
+
+All auctions can be found in the output.json file
 """
 
 """
@@ -78,7 +80,7 @@ class warframeApi:
                 # TODO: Build Mod scanner function
                 print('Mods pending at this time')
             if 'arcanes' in str(i).lower():
-                # TODO: Build arcane scanner function
+                # TODO: Build Arcane scanner function
                 print('Arcanes pending at this time')
 
                 pass
@@ -193,43 +195,43 @@ executed = True
 # test.get_arcane("Arcane grace")
 counter = 0 
 
-while executed:
-    print("If you want to cancel script, enter 'y', exit, or an empty value (space)")
+# while executed:
+#     print("If you want to cancel script, enter 'y', exit, or an empty value (space)")
     
-    choice = input('What mode would you like to use? \n\t [1] Scan Warframe market \n\t [2] Scan Item Details \n ENTER HERE: ')
-    scan_item = input("\nPlease enter item to scan: ")
+#     choice = input('What mode would you like to use? \n\t [1] Scan Warframe market \n\t [2] Scan Item Details \n ENTER HERE: ')
+#     scan_item = input("\nPlease enter item to scan: ")
 
-    if int(choice) == 1:
-        # scan_item = 'Torid acri-ignicron'
-        if str(scan_item).lower() in ["exit"," ","y"]:
-            break
+#     if int(choice) == 1:
+#         # scan_item = 'Torid acri-ignicron'
+#         if str(scan_item).lower() in ["exit"," ","y"]:
+#             break
         
-        else:
-            counter +=1
-            print(f"Scanning for {scan_item}")
+#         else:
+#             counter +=1
+#             print(f"Scanning for {scan_item}")
             
-            # Torid acri-ignicron
+#             # Torid acri-ignicron
 
-        output = test.getRiven(scan_item)
-        if output[0] or not TypeError:
-            print(output[1])
-        try:
-            output = test.scan_warframe(scan_item)[1]
-        except Exception as e:
-            try:
-                newItem = scan_item + ' Blueprint'
-                output = test.scan_warframe(newItem)[1]
-            except Exception as e:
-                print(f"Error : {e} \n Unable to locate item \n\n")
+#         output = test.getRiven(scan_item)
+#         if output[0] or not TypeError:
+#             print(output[1])
+#         try:
+#             output = test.scan_warframe(scan_item)[1]
+#         except Exception as e:
+#             try:
+#                 newItem = scan_item + ' Blueprint'
+#                 output = test.scan_warframe(newItem)[1]
+#             except Exception as e:
+#                 print(f"Error : {e} \n Unable to locate item \n\n")
         
-        print(output)
-    elif int(choice) == 2:
-        if str(scan_item).lower() in ["exit"," ","y"]:
-            break
-        test.how_to_get_item(scan_item)
-        print(test.acquisition)
-    else:
-        break
+#         print(output)
+#     elif int(choice) == 2:
+#         if str(scan_item).lower() in ["exit"," ","y"]:
+#             break
+#         test.how_to_get_item(scan_item)
+#         print(test.acquisition)
+#     else:
+#         break
 
 # Testing section
 # scan_item = 'dante'
